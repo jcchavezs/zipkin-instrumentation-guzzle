@@ -1,0 +1,27 @@
+{
+    "name": "jcchavezs/zipkin-instrumentation-guzzle",
+    "description": "Zipkin instrumentation for Guzzle HTTP Client",
+    "type": "library",
+    "require": {
+        "guzzle/guzzle": "^3.9",
+        "jcchavezs/zipkin": "^1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "José Carlos Chávez",
+            "email": "jcchavezs@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+	"autoload": {
+		"psr-4": {
+			"ZipkinGuzzle\\": "./src/ZipkinGuzzle/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"ZipkinGuzzle\\Tests\\": "./tests/"
+		}
+	}
+}
