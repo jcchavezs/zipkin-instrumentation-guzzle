@@ -26,7 +26,7 @@ final class Client implements ClientInterface
      */
     private $tracing;
 
-    public function __construct(Tracing $tracing, $client = null)
+    public function __construct(Tracing $tracing, ClientInterface $client = null)
     {
         $this->tracing = $tracing;
         $this->client = $client ?: new GuzzleClient();
@@ -41,13 +41,14 @@ final class Client implements ClientInterface
         $span->setName($request->getMethod());
         $span->setKind(Kind\CLIENT);
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
-        $span->tag(Tags\HTTP_URL, $request->getUri());
+        $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
 
         $scopeCloser = $this->tracing->getTracer()->openScope($span);
 
         try {
             $injector = $this->tracing->getPropagation()->getInjector(new RequestHeaders());
             $injector($span->getContext(), $request);
+            $span->start();
             $response = $this->client->send($request, $options);
             $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
             return $response;
@@ -69,19 +70,18 @@ final class Client implements ClientInterface
         $span->setName($request->getMethod());
         $span->setKind(Kind\CLIENT);
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
-        $span->tag(Tags\HTTP_URL, $request->getUri());
+        $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
 
         $scopeCloser = $this->tracing->getTracer()->openScope($span);
 
         $injector = $this->tracing->getPropagation()->getInjector(new RequestHeaders());
         $injector($span->getContext(), $request);
         $promise = $this->client->sendAsync($request, $options)->then(
-            function(ResponseInterface $response) use ($span) {
+            function (ResponseInterface $response) use ($span) {
                 $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
             },
-            function(RequestException $e) use ($span) {
+            function (RequestException $e) use ($span) {
                 $span->tag(Tags\ERROR, $e->getMessage());
-                throw $e;
             }
         );
 
@@ -102,7 +102,7 @@ final class Client implements ClientInterface
         $span->setName($method);
         $span->setKind(Kind\CLIENT);
         $span->tag(Tags\HTTP_METHOD, $method);
-        $span->tag(Tags\HTTP_URL, $uri->getPath());
+        $span->tag(Tags\HTTP_PATH, $uri->getPath());
 
         $scopeCloser = $this->tracing->getTracer()->openScope($span);
 
@@ -133,7 +133,7 @@ final class Client implements ClientInterface
         $span->setName($method);
         $span->setKind(Kind\CLIENT);
         $span->tag(Tags\HTTP_METHOD, $method);
-        $span->tag(Tags\HTTP_URL, $uri->getPath());
+        $span->tag(Tags\HTTP_PATH, $uri->getPath());
 
         $scopeCloser = $this->tracing->getTracer()->openScope($span);
 
@@ -141,12 +141,11 @@ final class Client implements ClientInterface
         $injector = $this->tracing->getPropagation()->getInjector(new Map());
         $injector($span->getContext(), $headers);
         $promise = $this->client->requestAsync($method, $uri, ['headers' => $headers] + $options)->then(
-            function(ResponseInterface $response) use ($span) {
+            function (ResponseInterface $response) use ($span) {
                 $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
             },
-            function(RequestException $e) use ($span) {
+            function (RequestException $e) use ($span) {
                 $span->tag(Tags\ERROR, $e->getMessage());
-                throw $e;
             }
         );
 
