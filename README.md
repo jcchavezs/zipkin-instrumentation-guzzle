@@ -1,5 +1,7 @@
 # Zipkin instrumentation for Guzzle 
 
+[![Build Status](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle.svg?branch=master)](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle)
+
 Zipkin instrumentation for Guzzle HTTP Client.
 
 ## Install
