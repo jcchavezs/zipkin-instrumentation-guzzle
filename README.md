@@ -1,6 +1,9 @@
 # Zipkin instrumentation for Guzzle 
 
 [![Build Status](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle.svg?branch=master)](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle)
+[![Latest Stable Version](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/v/stable)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
+[![Total Downloads](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/downloads)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
+[![License](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/license)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
 
 Zipkin instrumentation for Guzzle HTTP Client.
 

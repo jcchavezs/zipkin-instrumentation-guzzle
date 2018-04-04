@@ -4,6 +4,7 @@ namespace ZipkinGuzzle\Middleware;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Zipkin\Kind;
@@ -58,7 +59,7 @@ function tracing(Tracing $tracing)
                     }
                     $span->finish();
                     $scopeCloser();
-                    return \GuzzleHttp\Promise\rejection_for($reason);
+                    return Promise\rejection_for($reason);
                 }
             );
         };

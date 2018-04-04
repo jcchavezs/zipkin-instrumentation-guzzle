@@ -23,7 +23,7 @@
 			"ZipkinGuzzle\\": "./src/ZipkinGuzzle/"
 		},
         "files": [
-            "src/ZipkinGuzzle/Middleware.php"
+            "./src/ZipkinGuzzle/Middleware.php"
         ]
 	},
 	"autoload-dev": {
