@@ -41,8 +41,7 @@ use ZipkinGuzzle\Middleware;
 $tracing = TracingBuilder::create()->build();
 
 $stack = HandlerStack::create();
-    $stack->push(Middleware\tracing($tracing));
-    return $stack;
+$stack->push(Middleware\tracing($tracing));
 
 $client = new Client([
     'handler' => $stack,
