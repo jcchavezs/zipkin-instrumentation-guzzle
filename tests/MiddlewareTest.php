@@ -49,7 +49,8 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
             'handler' => $handler,
         ]);
 
-        if ($expectedResponse instanceof RequestException) {
+        if ($expectedResponse instanceof RequestException
+            || ($expectedResponse instanceof Response && $expectedResponse->getStatusCode() > 399)) {
             $this->expectException(RequestException::Class);
         }
 
@@ -126,6 +127,21 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 new Response(300)
+            ],
+            [
+                [
+                    'name' => self::METHOD,
+                    'debug' => false,
+                    'localEndpoint' => [],
+                    'kind' => 'CLIENT',
+                    'tags' => [
+                        'http.method' => self::METHOD,
+                        'http.path' => '/test',
+                        'http.status_code' => 300,
+                        'error' => true,
+                    ],
+                ],
+                new Response(400)
             ],
             [
                 [

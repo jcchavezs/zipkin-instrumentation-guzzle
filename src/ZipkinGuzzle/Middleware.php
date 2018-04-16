@@ -45,6 +45,9 @@ function tracing(Tracing $tracing)
             return $handler($request, $options)->then(
                 function (ResponseInterface $response) use ($span, $scopeCloser) {
                     $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
+                    if ($response->getStatusCode() > 399) {
+                        $span->tag(Tags\ERROR, true);
+                    }
                     $span->finish();
                     $scopeCloser();
                     return $response;
