@@ -20,6 +20,8 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
     const URI = 'http://domain.com/test?key=value';
     const HEADER_KEY = 'test_key';
     const HEADER_VALUE = 'test_value';
+    const TAG_KEY = 'tag_key';
+    const TAG_VALUE = 'tag_value';
     const BODY = 'test_body';
 
     public function getRequest()
@@ -41,7 +43,7 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
             ->havingReporter($reporter)
             ->havingSampler(BinarySampler::createAsAlwaysSample())
             ->build();
-        $middleware = Middleware\tracing($tracing);
+        $middleware = Middleware\tracing($tracing, [self::TAG_KEY => self::TAG_VALUE]);
         $handler = HandlerStack::create(new MockHandler([$expectedResponse]));
         $handler->push($middleware);
 
@@ -64,7 +66,10 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
         $arraySpan = $reporter->getSpans()[0]->toArray();
         $this->assertNotNull($arraySpan['timestamp']);
         $this->assertNotNull($arraySpan['duration']);
-        $this->assertArraySubset($expectedSpanSubset, $arraySpan);
+
+        foreach ($expectedSpanSubset as $key => $value) {
+            $this->assertEquals($value, $arraySpan[$key]);
+        }
     }
 
     public function testMiddlewareInjectsHeaders()
@@ -104,11 +109,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                 [
                     'name' => self::METHOD,
                     'debug' => false,
-                    'localEndpoint' => [],
+                    'localEndpoint' => [
+                        'serviceName' => 'cli',
+                    ],
                     'kind' => 'CLIENT',
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
+                        self::TAG_KEY => self::TAG_VALUE,
                         'http.status_code' => 200,
                     ],
                 ],
@@ -118,11 +126,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                 [
                     'name' => self::METHOD,
                     'debug' => false,
-                    'localEndpoint' => [],
+                    'localEndpoint' => [
+                        'serviceName' => 'cli',
+                    ],
                     'kind' => 'CLIENT',
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
+                        self::TAG_KEY => self::TAG_VALUE,
                         'http.status_code' => 300,
                     ],
                 ],
@@ -132,11 +143,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                 [
                     'name' => self::METHOD,
                     'debug' => false,
-                    'localEndpoint' => [],
+                    'localEndpoint' => [
+                        'serviceName' => 'cli',
+                    ],
                     'kind' => 'CLIENT',
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
+                        self::TAG_KEY => self::TAG_VALUE,
                         'http.status_code' => 300,
                         'error' => true,
                     ],
@@ -147,11 +161,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                 [
                     'name' => self::METHOD,
                     'debug' => false,
-                    'localEndpoint' => [],
+                    'localEndpoint' => [
+                        'serviceName' => 'cli',
+                    ],
                     'kind' => 'CLIENT',
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
+                        self::TAG_KEY => self::TAG_VALUE,
                         'http.status_code' => 400,
                         'error' => true,
                     ],
@@ -162,12 +179,15 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                 [
                     'name' => self::METHOD,
                     'debug' => false,
-                    'localEndpoint' => [],
+                    'localEndpoint' => [
+                        'serviceName' => 'cli',
+                    ],
                     'kind' => 'CLIENT',
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
                         'http.status_code' => 500,
+                        self::TAG_KEY => self::TAG_VALUE,
                         'error' => true,
                     ],
                 ],

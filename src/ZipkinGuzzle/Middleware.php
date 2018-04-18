@@ -24,18 +24,24 @@ function defaultHandlerStack(Tracing $tracing)
 }
 
 /**
- * @param Tracing $tracing
+ * @param Tracing $tracing the tracing component/
+ * @param array $defaultTags the default tags being added to the span.
  * @return callable
  */
-function tracing(Tracing $tracing)
+function tracing(Tracing $tracing, array $defaultTags = [])
 {
-    return function (callable $handler) use ($tracing) {
-        return function (RequestInterface $request, array $options) use ($handler, $tracing) {
+    return function (callable $handler) use ($tracing, $defaultTags) {
+        return function (RequestInterface $request, array $options) use ($handler, $tracing, $defaultTags) {
             $span = $tracing->getTracer()->nextSpan();
             $span->setName($request->getMethod());
             $span->setKind(Kind\CLIENT);
             $span->tag(Tags\HTTP_METHOD, $request->getMethod());
             $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
+
+            foreach ($defaultTags as $key => $value) {
+                $span->tag($key, $value);
+            }
+
             $scopeCloser = $tracing->getTracer()->openScope($span);
 
             $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
