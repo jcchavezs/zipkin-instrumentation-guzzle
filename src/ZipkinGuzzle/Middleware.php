@@ -13,18 +13,25 @@ use Zipkin\Tracing;
 use ZipkinGuzzle\RequestHeaders;
 
 /**
- * @param Tracing $tracing
+ * @param Tracing $tracing the tracing component
+ * @param array $defaultTags the default tags being added to the span.
+ * @param array|callable[] $middlewares
  * @return HandlerStack
  */
-function defaultHandlerStack(Tracing $tracing)
+function handlerStack(Tracing $tracing, array $defaultTags = [], array $middlewares = [])
 {
     $stack = HandlerStack::create();
-    $stack->push(tracing($tracing));
+    $stack->push(tracing($tracing, $defaultTags));
+
+    foreach($middlewares as $middleware) {
+        $stack->push($middleware);
+    }
+
     return $stack;
 }
 
 /**
- * @param Tracing $tracing the tracing component/
+ * @param Tracing $tracing the tracing component
  * @param array $defaultTags the default tags being added to the span.
  * @return callable
  */
