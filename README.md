@@ -27,12 +27,12 @@ use ZipkinGuzzle\Middleware;
 $tracing = TracingBuilder::create()->build();
 
 // Default tags for all spans being created.
-$defaultTags = [
+$tags = [
    'instance' => $_SERVER['SERVER_NAME']
 ];
 
 $client = new Client([
-    'handler' => Middleware\handlerStack(Tracing $tracing, $defaultTags),
+    'handler' => Middleware\handlerStack(Tracing $tracing, $tags),
 ]);
 ```
 

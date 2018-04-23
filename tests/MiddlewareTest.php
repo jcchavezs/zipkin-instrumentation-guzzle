@@ -13,6 +13,7 @@ use PHPUnit_Framework_TestCase;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\TracingBuilder;
 use ZipkinGuzzle\Middleware;
+use Zipkin\Reporters\InMemory as InMemoryReporter;
 
 final class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
@@ -61,9 +62,11 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
 
         $tracing->getTracer()->flush();
 
-        $this->assertCount(1, $reporter->getSpans());
+        $spans = $reporter->flush();
 
-        $arraySpan = $reporter->getSpans()[0]->toArray();
+        $this->assertCount(1, $spans);
+
+        $arraySpan = $spans[0]->toArray();
         $this->assertNotNull($arraySpan['timestamp']);
         $this->assertNotNull($arraySpan['duration']);
 

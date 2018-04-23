@@ -3,7 +3,7 @@
     "description": "Zipkin instrumentation for Guzzle HTTP Client",
     "type": "library",
     "require": {
-        "jcchavezs/zipkin": "^1.0",
+        "jcchavezs/zipkin": "~1.2.2",
         "guzzlehttp/guzzle": "~6.2"
     },
     "require-dev": {
