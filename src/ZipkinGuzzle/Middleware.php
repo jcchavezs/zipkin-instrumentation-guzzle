@@ -13,29 +13,42 @@ use Zipkin\Tracing;
 use ZipkinGuzzle\RequestHeaders;
 
 /**
- * @param Tracing $tracing
+ * @param Tracing $tracing the tracing component
+ * @param array $tags the default tags being added to the span.
+ * @param array|callable[] $middlewares
  * @return HandlerStack
  */
-function defaultHandlerStack(Tracing $tracing)
+function handlerStack(Tracing $tracing, array $tags = [], array $middlewares = [])
 {
     $stack = HandlerStack::create();
-    $stack->push(tracing($tracing));
+    $stack->push(tracing($tracing, $tags));
+
+    foreach ($middlewares as $middleware) {
+        $stack->push($middleware);
+    }
+
     return $stack;
 }
 
 /**
- * @param Tracing $tracing
+ * @param Tracing $tracing the tracing component
+ * @param array $tags the default tags being added to the span.
  * @return callable
  */
-function tracing(Tracing $tracing)
+function tracing(Tracing $tracing, array $tags = [])
 {
-    return function (callable $handler) use ($tracing) {
-        return function (RequestInterface $request, array $options) use ($handler, $tracing) {
+    return function (callable $handler) use ($tracing, $tags) {
+        return function (RequestInterface $request, array $options) use ($handler, $tracing, $tags) {
             $span = $tracing->getTracer()->nextSpan();
             $span->setName($request->getMethod());
             $span->setKind(Kind\CLIENT);
             $span->tag(Tags\HTTP_METHOD, $request->getMethod());
             $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
+
+            foreach ($tags as $key => $value) {
+                $span->tag($key, $value);
+            }
+
             $scopeCloser = $tracing->getTracer()->openScope($span);
 
             $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
