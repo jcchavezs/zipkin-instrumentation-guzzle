@@ -2,15 +2,15 @@
 
 namespace ZipkinGuzzle\Middleware;
 
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Zipkin\Kind;
 use Zipkin\Tags;
 use Zipkin\Tracing;
-use ZipkinGuzzle\RequestHeaders;
+use Zipkin\Propagation\RequestHeaders;
 
 /**
  * @param Tracing $tracing the tracing component
@@ -52,12 +52,11 @@ function tracing(Tracing $tracing, array $tags = [])
                 $span->tag($key, $value);
             }
 
-            $scopeCloser = $tracer->openScope($span);
             $injector($span->getContext(), $request);
 
             $span->start();
             return $handler($request, $options)->then(
-                function (ResponseInterface $response) use ($span, $scopeCloser) {
+                function (ResponseInterface $response) use ($span) {
                     $statusCode = $response->getStatusCode();
                     $span->tag(Tags\HTTP_STATUS_CODE, (string) $statusCode);
                     if ($statusCode > 399) {
@@ -65,23 +64,21 @@ function tracing(Tracing $tracing, array $tags = [])
                     }
 
                     $span->finish();
-                    $scopeCloser();
                     return $response;
                 },
-                function ($reason) use ($span, $scopeCloser) {
+                function ($reason) use ($span) {
                     $error = 'true';
                     $response = null;
                     if ($reason instanceof RequestException) {
                         $response = $reason->getResponse();
                         $error = $reason->getMessage();
                     }
-                    
+
                     $span->tag(Tags\ERROR, $error);
                     if ($response !== null) {
-                        $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
+                        $span->tag(Tags\HTTP_STATUS_CODE, (string) $response->getStatusCode());
                     }
                     $span->finish();
-                    $scopeCloser();
                     return Promise\rejection_for($reason);
                 }
             );
