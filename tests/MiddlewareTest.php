@@ -54,7 +54,7 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
 
         if ($expectedResponse instanceof RequestException
             || ($expectedResponse instanceof Response && $expectedResponse->getStatusCode() > 399)) {
-            $this->expectException(RequestException::Class);
+            $this->expectException(RequestException::class);
         }
 
         $actualResponse = $client->send($request);

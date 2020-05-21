@@ -24,7 +24,7 @@ final class RequestHeaders implements Setter
         }
         
         if ($carrier instanceof RequestInterface) {
-            $carrier = $carrier->withAddedHeader($key, $value);
+            $carrier = $carrier->withHeader($key, $value);
             return;
         }
 

@@ -37,9 +37,12 @@ function handlerStack(Tracing $tracing, array $tags = [], array $middlewares = [
  */
 function tracing(Tracing $tracing, array $tags = [])
 {
-    return function (callable $handler) use ($tracing, $tags) {
-        return function (RequestInterface $request, array $options) use ($handler, $tracing, $tags) {
-            $span = $tracing->getTracer()->nextSpan();
+    $tracer = $tracing->getTracer();
+    $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
+    
+    return function (callable $handler) use ($tracer, $injector, $tags) {
+        return function (RequestInterface $request, array $options) use ($handler, $tracer, $injector, $tags) {
+            $span = $tracer->nextSpan();
             $span->setName($request->getMethod());
             $span->setKind(Kind\CLIENT);
             $span->tag(Tags\HTTP_METHOD, $request->getMethod());
@@ -49,9 +52,7 @@ function tracing(Tracing $tracing, array $tags = [])
                 $span->tag($key, $value);
             }
 
-            $scopeCloser = $tracing->getTracer()->openScope($span);
-
-            $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
+            $scopeCloser = $tracer->openScope($span);
             $injector($span->getContext(), $request);
 
             $span->start();
@@ -61,15 +62,20 @@ function tracing(Tracing $tracing, array $tags = [])
                     if ($response->getStatusCode() > 399) {
                         $span->tag(Tags\ERROR, true);
                     }
+
                     $span->finish();
                     $scopeCloser();
                     return $response;
                 },
                 function ($reason) use ($span, $scopeCloser) {
-                    $response = $reason instanceof RequestException
-                        ? $reason->getResponse()
-                        : null;
-                    $span->tag(Tags\ERROR, true);
+                    $error = true;
+                    $response = null;
+                    if ($reason instanceof RequestException) {
+                        $response = $reason->getResponse();
+                        $error = $reason->getMessage();
+                    }
+                    
+                    $span->tag(Tags\ERROR, $error);
                     if ($response !== null) {
                         $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
                     }
