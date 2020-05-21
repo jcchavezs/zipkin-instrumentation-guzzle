@@ -18,6 +18,7 @@ use Zipkin\Reporters\InMemory as InMemoryReporter;
 final class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
     const METHOD = 'POST';
+    const METHOD_LOWERCASE = 'post';
     const URI = 'http://domain.com/test?key=value';
     const HEADER_KEY = 'test_key';
     const HEADER_VALUE = 'test_value';
@@ -54,7 +55,7 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
 
         if ($expectedResponse instanceof RequestException
             || ($expectedResponse instanceof Response && $expectedResponse->getStatusCode() > 399)) {
-            $this->expectException(RequestException::Class);
+            $this->expectException(RequestException::class);
         }
 
         $actualResponse = $client->send($request);
@@ -110,7 +111,7 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'name' => self::METHOD,
+                    'name' => 'http/' . self::METHOD_LOWERCASE,
                     'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
@@ -120,14 +121,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
                         self::TAG_KEY => self::TAG_VALUE,
-                        'http.status_code' => 200,
+                        'http.status_code' => '200',
                     ],
                 ],
                 new Response(200)
             ],
             [
                 [
-                    'name' => self::METHOD,
+                    'name' => 'http/' . self::METHOD_LOWERCASE,
                     'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
@@ -137,14 +138,14 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
                         self::TAG_KEY => self::TAG_VALUE,
-                        'http.status_code' => 300,
+                        'http.status_code' => '300',
                     ],
                 ],
                 new Response(300)
             ],
             [
                 [
-                    'name' => self::METHOD,
+                    'name' => 'http/' . self::METHOD_LOWERCASE,
                     'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
@@ -154,15 +155,15 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
                         self::TAG_KEY => self::TAG_VALUE,
-                        'http.status_code' => 300,
-                        'error' => true,
+                        'http.status_code' => '300',
+                        'error' => 'true',
                     ],
                 ],
                 new Response(400)
             ],
             [
                 [
-                    'name' => self::METHOD,
+                    'name' => 'http/' . self::METHOD_LOWERCASE,
                     'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
@@ -172,15 +173,15 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
                         self::TAG_KEY => self::TAG_VALUE,
-                        'http.status_code' => 400,
-                        'error' => true,
+                        'http.status_code' => '400',
+                        'error' => 'true',
                     ],
                 ],
                 new RequestException('Error 400', $this->getRequest(), new Response(400))
             ],
             [
                 [
-                    'name' => self::METHOD,
+                    'name' => 'http/' . self::METHOD_LOWERCASE,
                     'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
@@ -189,9 +190,9 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
                     'tags' => [
                         'http.method' => self::METHOD,
                         'http.path' => '/test',
-                        'http.status_code' => 500,
+                        'http.status_code' => '500',
                         self::TAG_KEY => self::TAG_VALUE,
-                        'error' => true,
+                        'error' => 'true',
                     ],
                 ],
                 new RequestException('Error 500', $this->getRequest(), new Response(500))

@@ -37,10 +37,13 @@ function handlerStack(Tracing $tracing, array $tags = [], array $middlewares = [
  */
 function tracing(Tracing $tracing, array $tags = [])
 {
-    return function (callable $handler) use ($tracing, $tags) {
-        return function (RequestInterface $request, array $options) use ($handler, $tracing, $tags) {
-            $span = $tracing->getTracer()->nextSpan();
-            $span->setName($request->getMethod());
+    $tracer = $tracing->getTracer();
+    $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
+
+    return function (callable $handler) use ($tracer, $injector, $tags) {
+        return function (RequestInterface $request, array $options) use ($handler, $tracer, $injector, $tags) {
+            $span = $tracer->nextSpan();
+            $span->setName($request->getUri()->getScheme() . '/' . strtolower($request->getMethod()));
             $span->setKind(Kind\CLIENT);
             $span->tag(Tags\HTTP_METHOD, $request->getMethod());
             $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
@@ -49,27 +52,31 @@ function tracing(Tracing $tracing, array $tags = [])
                 $span->tag($key, $value);
             }
 
-            $scopeCloser = $tracing->getTracer()->openScope($span);
-
-            $injector = $tracing->getPropagation()->getInjector(new RequestHeaders());
+            $scopeCloser = $tracer->openScope($span);
             $injector($span->getContext(), $request);
 
             $span->start();
             return $handler($request, $options)->then(
                 function (ResponseInterface $response) use ($span, $scopeCloser) {
-                    $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
-                    if ($response->getStatusCode() > 399) {
-                        $span->tag(Tags\ERROR, true);
+                    $statusCode = $response->getStatusCode();
+                    $span->tag(Tags\HTTP_STATUS_CODE, (string) $statusCode);
+                    if ($statusCode > 399) {
+                        $span->tag(Tags\ERROR, (string) $statusCode);
                     }
+
                     $span->finish();
                     $scopeCloser();
                     return $response;
                 },
                 function ($reason) use ($span, $scopeCloser) {
-                    $response = $reason instanceof RequestException
-                        ? $reason->getResponse()
-                        : null;
-                    $span->tag(Tags\ERROR, true);
+                    $error = 'true';
+                    $response = null;
+                    if ($reason instanceof RequestException) {
+                        $response = $reason->getResponse();
+                        $error = $reason->getMessage();
+                    }
+                    
+                    $span->tag(Tags\ERROR, $error);
                     if ($response !== null) {
                         $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
                     }

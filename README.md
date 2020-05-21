@@ -15,8 +15,7 @@ composer require jcchavezs/zipkin-instrumentation-guzzle
 
 ## Usage
 
-`ZipkinGuzzle\Middleware` is an [Guzzle middleware](http://docs.guzzlephp.org/en/stable/handlers-and-middleware.html) that can be 
-used along with `GuzzleHttp\Client` in order to create a span and propagate the context.
+`ZipkinGuzzle\Middleware` is an [Guzzle middleware](http://docs.guzzlephp.org/en/stable/handlers-and-middleware.html) that can be used along with `GuzzleHttp\Client` in order to create a span and propagate the context.
 
 ### Default handler
 
@@ -26,13 +25,13 @@ use ZipkinGuzzle\Middleware;
 
 $tracing = TracingBuilder::create()->build();
 
-// Default tags for all spans being created.
+// Default tags for all spans being created. They are not mandatory.
 $tags = [
    'instance' => $_SERVER['SERVER_NAME']
 ];
 
 $client = new Client([
-    'handler' => Middleware\handlerStack(Tracing $tracing, $tags),
+    'handler' => Middleware\handlerStack($tracing, $tags),
 ]);
 ```
 
