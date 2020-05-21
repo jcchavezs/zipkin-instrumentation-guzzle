@@ -9,13 +9,13 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware as GuzzleMiddleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\TracingBuilder;
 use ZipkinGuzzle\Middleware;
 use Zipkin\Reporters\InMemory as InMemoryReporter;
 
-final class MiddlewareTest extends PHPUnit_Framework_TestCase
+final class MiddlewareTest extends TestCase
 {
     const METHOD = 'POST';
     const METHOD_LOWERCASE = 'post';
@@ -54,7 +54,8 @@ final class MiddlewareTest extends PHPUnit_Framework_TestCase
         ]);
 
         if ($expectedResponse instanceof RequestException
-            || ($expectedResponse instanceof Response && $expectedResponse->getStatusCode() > 399)) {
+            || ($expectedResponse instanceof Response && $expectedResponse->getStatusCode() > 399)
+        ) {
             $this->expectException(RequestException::class);
         }
 
