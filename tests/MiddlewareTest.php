@@ -2,18 +2,18 @@
 
 namespace ZipkinGuzzle\Tests;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use Zipkin\TracingBuilder;
+use Zipkin\Samplers\BinarySampler;
+use Zipkin\Reporters\InMemory as InMemoryReporter;
+use ZipkinGuzzle\Middleware;
+use PHPUnit\Framework\TestCase;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Middleware as GuzzleMiddleware;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware as GuzzleMiddleware;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
-use Zipkin\Samplers\BinarySampler;
-use Zipkin\TracingBuilder;
-use ZipkinGuzzle\Middleware;
-use Zipkin\Reporters\InMemory as InMemoryReporter;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
 
 final class MiddlewareTest extends TestCase
 {
@@ -113,7 +113,6 @@ final class MiddlewareTest extends TestCase
             [
                 [
                     'name' => 'http/' . self::METHOD_LOWERCASE,
-                    'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
                     ],
@@ -130,7 +129,6 @@ final class MiddlewareTest extends TestCase
             [
                 [
                     'name' => 'http/' . self::METHOD_LOWERCASE,
-                    'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
                     ],
@@ -147,7 +145,6 @@ final class MiddlewareTest extends TestCase
             [
                 [
                     'name' => 'http/' . self::METHOD_LOWERCASE,
-                    'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
                     ],
@@ -165,7 +162,6 @@ final class MiddlewareTest extends TestCase
             [
                 [
                     'name' => 'http/' . self::METHOD_LOWERCASE,
-                    'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
                     ],
@@ -183,7 +179,6 @@ final class MiddlewareTest extends TestCase
             [
                 [
                     'name' => 'http/' . self::METHOD_LOWERCASE,
-                    'debug' => false,
                     'localEndpoint' => [
                         'serviceName' => 'cli',
                     ],
