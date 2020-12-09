@@ -3,7 +3,7 @@
     "description": "Zipkin instrumentation for Guzzle HTTP Client",
     "type": "library",
     "require": {
-        "openzipkin/zipkin": "^1.3.6|^2.0",
+        "openzipkin/zipkin": "^2.0",
         "guzzlehttp/guzzle": "~6.2 || ^7.0"
     },
     "require-dev": {
