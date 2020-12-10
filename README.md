@@ -1,6 +1,6 @@
 # Zipkin instrumentation for Guzzle 
 
-[![Build Status](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle.svg?branch=master)](https://travis-ci.org/jcchavezs/zipkin-instrumentation-guzzle)
+![CI](https://github.com/jcchavezs/zipkin-instrumentation-guzzle/workflows/CI/badge.svg)
 [![Latest Stable Version](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/v/stable)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
 [![Total Downloads](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/downloads)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
 [![License](https://poser.pugx.org/jcchavezs/zipkin-instrumentation-guzzle/license)](https://packagist.org/packages/jcchavezs/zipkin-instrumentation-guzzle)
@@ -57,3 +57,8 @@ $client = new Client([
     'handler' => $stack,
 ]);
 ```
+
+## Guzzle 7
+
+Guzzle 7 is [compatible with PSR18 clients](https://github.com/guzzle/guzzle/blob/7.2.0/CHANGELOG.md#700-beta1---2019-12-30), hence you can use the native Zipkin instrumentation.
+Check https://github.com/openzipkin/zipkin-php/tree/master/src/Zipkin/Instrumentation/Http/Client/Psr18#usage for more details.

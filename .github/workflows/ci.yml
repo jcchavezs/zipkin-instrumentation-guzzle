@@ -1,15 +1,25 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
 
 jobs:
   run:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
-        php-versions: ['7.1', '7.2', '7.3', '7.4']
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+        php-versions: ["7.1", "7.2", "7.3", "7.4"]
+        guzzle-versions: ["~6.2", "^7.0"]
+        exclude:
+          - php-versions: "7.1"
+            guzzle-versions: "^7.0"
+    name: Guzzle ${{ matrix.guzzle-versions }} over PHP ${{ matrix.php-versions }}
 
     steps:
       - name: Checkout
@@ -22,11 +32,14 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, intl, zip
           coverage: none
 
+      - name: Fix Guzzle version
+        run: composer require guzzlehttp/guzzle:"${{ matrix.guzzle-versions }}"
+
       - name: Install dependencies
         run: composer install
 
       - name: Run coding style checking
         run: composer lint
 
-      - name: Run test suites
+      - name: Run test suite
         run: composer test
