@@ -8,7 +8,8 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['7.1', '7.2', '7.3', '7.4']
+        php-versions: ["7.1", "7.2", "7.3", "7.4"]
+        guzzle-versions: ["~6.2", "^7.0"]
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
@@ -21,6 +22,9 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, pdo, pdo_mysql, intl, zip
           coverage: none
+
+      - name: Fix Guzzle version
+        run: composer require guzzlehttp/guzzle:"${{ matrix.guzzle-versions }}"
 
       - name: Install dependencies
         run: composer install
