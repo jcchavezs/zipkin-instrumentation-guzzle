@@ -4,16 +4,15 @@ on: [push, pull_request]
 
 jobs:
   run:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         php-versions: ["7.1", "7.2", "7.3", "7.4"]
         guzzle-versions: ["~6.2", "^7.0"]
         exclude:
           - php-versions: "7.1"
             guzzle-versions: "^7.0"
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    name: Guzzle ${{ matrix.guzzle-versions }} over PHP ${{ matrix.php-versions }}
 
     steps:
       - name: Checkout
@@ -35,5 +34,5 @@ jobs:
       - name: Run coding style checking
         run: composer lint
 
-      - name: Run test suites
+      - name: Run test suite
         run: composer test
