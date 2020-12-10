@@ -10,6 +10,9 @@ jobs:
         operating-system: [ubuntu-latest]
         php-versions: ["7.1", "7.2", "7.3", "7.4"]
         guzzle-versions: ["~6.2", "^7.0"]
+        exclude:
+          - php-versions: "7.1"
+            guzzle-versions: "^7.0"
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
